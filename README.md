@@ -125,7 +125,7 @@ Additionally, if the results of the next data_getting function are determined by
         else:
             break
     
-You can run it with backgrounder by passing it a closure like so:
+You can run it with backgrounder by passing it a closure like so, note that you have to tell Backgrounder that it is a closure through closure=True argument:
   
     def closure_test(self,start_id,offset,max_id):
         #Something like getting data from the database
@@ -148,7 +148,7 @@ You can run it with backgrounder by passing it a closure like so:
     max_id = 100
     test3results = []
     a = time()
-    bg = Backgrounder(self.closure_test, fn_args=[start_id,offset,max_id],closure=True,sentinel=False)
+    bg = Backgrounder(self.closure_test, fn_args=[start_id,offset,max_id],closure=True)
     while bg.status():
         data = bg.get_one()
         if data:
