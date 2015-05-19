@@ -1,7 +1,5 @@
-#!/apps/solr/python/bin/python3
 import logging
 import sys
-sys.path.append('/data/loganalysis/pythonscripts/libs')
 import code
 import unittest
 from Backgrounder import Backgrounder
@@ -77,7 +75,7 @@ class Backgrounder_tests(unittest.TestCase):
     
     #### 
     #### Test Cases
-    @unittest.skip("Complete")
+
     def test_regular_function(self):
         basedata = [x for x in range(1,21)] 
         #Run it as usually
@@ -105,8 +103,7 @@ class Backgrounder_tests(unittest.TestCase):
         logging.info(test1results)
         logging.info(test2results)
         self.assertEqual(test1results,test2results)
-    
-    @unittest.skip("Complete")
+
     def test_closure_function(self):
         basedata = [x for x in range(1,101)] 
         
@@ -164,7 +161,7 @@ class Backgrounder_tests(unittest.TestCase):
         self.assertEqual(test1results,test3results)
     
     
-    @unittest.skip("Complete")
+
     def test_with_generator_as_input(self):
         basedata = [x for x in range(1,11)] 
         
@@ -192,7 +189,7 @@ class Backgrounder_tests(unittest.TestCase):
         logging.info(test2results)
         self.assertEqual(test1results,test2results)
         
-    
+    @unittest.skip("WIP")
     def test_nested_backgrounders(self):
         basedata = [x for x in range(1,21)]
         
