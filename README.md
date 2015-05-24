@@ -1,14 +1,20 @@
 #Backgrounder README
 
-Backgrounder is supposed to make this faster, with minimal code refractoring. 
+Lets say you have something like this: 
 
+    x = self.slow_data_getting_function(1,test1) #Lets say this takes a second
+    while x:
+        self.slow_processing_function(x) #Lets say this takes a second too
+        x = self.slow_data_getting_function(1,test1)
 
-    somewhere = DBorSomething(stuff) #make a new connection to something
-    for some_item in somewhere.getdata(somewhat, somehow) #Get somewhat (batch based pulling) like somehow, let say this takes 1 second
-        do_stuff_to(some_item) # for each item returned do something, lets say this takes 1 second as well.
+You can run it like this with backgroudner and cut the time almost in half:
 
-
-
+    bg=Backgrounder(self.slow_data_getting_function,fn_args=[1,test2]) #Starts backgrounder
+    while bg.status(): 
+        x = bg.get_one() #While it is running pull out some items
+        if x:
+            self.slow_processing_function(x) $Process it. Once this is done, next data from slow_data_getting_function is already available.
+            
 If this has to process 10 items, it will take 20 seconds and some change. 10 seconds for pulling and 10 seconds for processing.Backgroudner is supposed to run methods like getdata in a background thread, so once do_stuff_to() returns, the next call to getdata will pull results that are already local.
 
 Results look something like this:

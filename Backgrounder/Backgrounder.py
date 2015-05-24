@@ -1,41 +1,28 @@
 __author__ = 'nikitavasilyev'
 import logging
 import sys
-from time import time,sleep
+from time import time, sleep
 import threading
 from queue import Queue
 
-#To Do:
-#- Fix function arguments
-#- Implement a way to increase the number of functions
-#- Implement a way to join functions when there is a low load requirement
-#- Implement input queue polling
-#- Implement input iterator polling
-#- Start Joining Threads
-
-
-#- Joining backgrounders should be at object and not queue level
-#- Remap worker processes and COMPLETION to make sure it's sycned
-
 
 class Backgrounder():
-
     def __init__(self,
-                func,
-                name='BG',
-                fn_args=(),
-                fn_kwargs={},
-                in_q = None,
-                in_bg = None,
-                in_iter = None,
-                min_q = 5,
-                max_q = 10,
-                sentinel=False,
-                max_threads = 5,
-                min_threads = 1,
-                closure=False,
-                generator=False,
-                ):
+                 func,
+                 name='BG',
+                 fn_args=(),
+                 fn_kwargs={},
+                 in_q=None,
+                 in_bg=None,
+                 in_iter=None,
+                 min_q=5,
+                 max_q=10,
+                 sentinel=False,
+                 max_threads=5,
+                 min_threads=1,
+                 closure=False,
+                 generator=False,
+    ):
 
         self.func = func
         self.fn_args = fn_args
@@ -54,31 +41,31 @@ class Backgrounder():
         self.min_threads = min_threads
         self.delay = 1
         self.metrics = {}
-        self.go = False 
+        self.go = False
         # Whenever threads should proceed processing. 
         # Can be set to False/True to indicate whenever threads will work or should pause. Will change during runtime.
         self.event_loop_delay = 2
         self.thread_sleep = 0.1
-        self.notdone=True 
+        self.notdone = True
         # Controls the main execution of things. This will only be set to False when all tasks are processed 
         # as indicated by sentinel value or external call. Threads will finish their current work and stop.
         self.closure = closure
-        self.stopper = threading.Thread(target=self._stopper,name='{} - ThreadStopper'.format(self.name))
+        self.stopper = threading.Thread(target=self._stopper, name='{} - ThreadStopper'.format(self.name))
         self.stopper.start()
         # Turn the logging to super high, used for dev only.
         self.verbose = False
-        self.stopathread = False 
+        self.stopathread = False
         # Will kick in if backgrounder is processing too fast and there are long pauses. 
         # Threadstopper will pick this up and try to stop a thread
-        self.totally_done = False 
+        self.totally_done = False
         # Indicates that all work is finished and all threads are joined. No more modifications to the queues
         self.generator = generator
         if self.closure:
             self.max_threads = 1
-            self.func = self.func(*self.fn_args,**self.fn_kwargs)
+            self.func = self.func(*self.fn_args, **self.fn_kwargs)
 
         if generator:
-            self.gen = func(*fn_args,**fn_kwargs)
+            self.gen = func(*fn_args, **fn_kwargs)
             self.func = self.gen.__next__
             self.max_threads = 1
 
@@ -90,7 +77,7 @@ class Backgrounder():
         # Create a separate thread for managing this object
         if self.verbose:
             logging.debug("Starting Backgrounder Processing")
-        self.event_loop = threading.Thread(target=self._event_loop,name='{}-EventLoopThread'.format(self.name))
+        self.event_loop = threading.Thread(target=self._event_loop, name='{}-EventLoopThread'.format(self.name))
         self.event_loop.start()
         sleep(3)
 
@@ -107,7 +94,7 @@ class Backgrounder():
                 thread = self.threads.pop()
                 thread._prep_to_halt()
                 thread.join()
-                self.stopathread=False
+                self.stopathread = False
             if not self.notdone:
                 return
 
@@ -139,7 +126,7 @@ class Backgrounder():
             logging.debug("IN_BG: {}".format(self.in_bg.status()))
 
     def get_one(self):
-        if self.out_q.qsize()>0:
+        if self.out_q.qsize() > 0:
             i = self.out_q.get()
             self.out_q.task_done()
             return i
@@ -160,13 +147,13 @@ class Backgrounder():
         if self.go:
             if self.verbose:
                 logging.debug("Pausing Workers")
-            self.go=False
+            self.go = False
 
     def _resume_work(self):
         if not self.go:
             if self.verbose:
                 logging.debug("Resuming Workers")
-            self.go=True
+            self.go = True
 
     def _is_working(self):
         return self.go
@@ -201,12 +188,12 @@ class Backgrounder():
         while self.notdone:
             if self.out_q.qsize() < self.max_q:
                 cons = 0
-                run +=1
+                run += 1
                 self._resume_work()
                 self._event_loop_sleep()
 
             if self.out_q.qsize() >= self.max_q:
-                cons +=1
+                cons += 1
                 runs = 0
                 self._pause_work()
                 self._event_loop_sleep()
@@ -222,7 +209,7 @@ class Backgrounder():
                     logging.debug("Increasing event loop delay to: " + str(self.event_loop_delay))
                 runs = 0
                 cons = 0
-                self.stopathread=True
+                self.stopathread = True
 
             if run > 5 and (self.out_q.qsize() < (self.max_q * 0.60)) and len(self.threads) < self.max_threads:
                 # If after 5 runs the out queue is still smaller than 60 % of maximum, increase some threads
@@ -234,7 +221,8 @@ class Backgrounder():
 
             cons += 1
             if self.verbose:
-                logging.debug("Event Loop Sleeping: CONS: {}, RUNS: {}, outQSize: {}".format(cons,run,self.out_q.qsize()))
+                logging.debug(
+                    "Event Loop Sleeping: CONS: {}, RUNS: {}, outQSize: {}".format(cons, run, self.out_q.qsize()))
                 self._dump_guts()
             self.cons = cons
             self.run = run
@@ -256,13 +244,16 @@ class Backgrounder():
             logging.debug("Starting New Worker Thread")
         thread = ''
         if self.fn_args and self.fn_kwargs:
-            thread = BackgrounderWorker(bg=self,args=(self.fn_args), kwargs=(self.fn_kwargs),name='{}-Worker-{}'.format(self.name,str(len(self.threads)+1)))
+            thread = BackgrounderWorker(bg=self, args=(self.fn_args), kwargs=(self.fn_kwargs),
+                                        name='{}-Worker-{}'.format(self.name, str(len(self.threads) + 1)))
         elif self.fn_args:
-            thread = BackgrounderWorker(bg=self,args=(self.fn_args),name='{}-Worker-{}'.format(self.name,str(len(self.threads)+1)))
+            thread = BackgrounderWorker(bg=self, args=(self.fn_args),
+                                        name='{}-Worker-{}'.format(self.name, str(len(self.threads) + 1)))
         elif self.fn_kwargs:
-            thread = BackgrounderWorker(bg=self,kwargs=(self.fn_kwargs),name='{}-Worker-{}'.format(self.name,str(len(self.threads)+1)))
+            thread = BackgrounderWorker(bg=self, kwargs=(self.fn_kwargs),
+                                        name='{}-Worker-{}'.format(self.name, str(len(self.threads) + 1)))
         else:
-            thread = BackgrounderWorker(bg=self,name='{}-Worker-{}'.format(self.name,str(len(self.threads)+1)))
+            thread = BackgrounderWorker(bg=self, name='{}-Worker-{}'.format(self.name, str(len(self.threads) + 1)))
         thread.start()
 
         self.threads.append(thread)
@@ -270,9 +261,9 @@ class Backgrounder():
 
 
 class BackgrounderWorker(threading.Thread):
-    def __init__(self,*args,**kwargs):
+    def __init__(self, *args, **kwargs):
         threading.Thread.__init__(self)
-        self.bg=kwargs['bg']
+        self.bg = kwargs['bg']
         self.halt = False
         # Halt means thread should stop after it's loop and get ready to be joined
         self.func = None
@@ -281,7 +272,7 @@ class BackgrounderWorker(threading.Thread):
         if 'name' in kwargs:
             self._name = kwargs['name']
 
-    def run(self,*args,**kwargs):
+    def run(self, *args, **kwargs):
         # While the module is running
         while self.bg.notdone:
             # While queue still needs additional items
@@ -296,7 +287,7 @@ class BackgrounderWorker(threading.Thread):
                 elif self.bg.in_q:
                     out = self._proc_in_q()
                 else:
-                    out = self.bg.func(*self.bg.fn_args,**self.bg.fn_kwargs)
+                    out = self.bg.func(*self.bg.fn_args, **self.bg.fn_kwargs)
 
                 if self._is_sentinel(out):
                     self._finish_working()
@@ -321,7 +312,7 @@ class BackgrounderWorker(threading.Thread):
         except Exception as e:
             logging.exception(e)
             logging.error("Crashed while running the generator")
-            self.halt=True
+            self.halt = True
 
 
     def _check_if_should_return(self):
@@ -333,7 +324,7 @@ class BackgrounderWorker(threading.Thread):
     def _proc_bg(self):
         # Pull item from another backgrounder
         try:
-            if self.bg.in_bg.out_q.qsize()>0:
+            if self.bg.in_bg.out_q.qsize() > 0:
                 item = self.bg.in_bg.get_one()
                 if item:
                     out = self.bg.func(item)
@@ -360,7 +351,7 @@ class BackgrounderWorker(threading.Thread):
             logging.exception(e)
 
 
-    def _is_sentinel(self,val):
+    def _is_sentinel(self, val):
         if val == self.bg.sentinel:
             logging.debug("Got Sentinel Value [{}]".format(val))
             self.got_sentinel = True
@@ -382,4 +373,4 @@ class BackgrounderWorker(threading.Thread):
 
     def _prep_to_halt(self):
         logging.debug("Getting ready to terminate thread")
-        self.halt=True
+        self.halt = True

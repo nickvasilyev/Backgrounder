@@ -1,0 +1,12 @@
+# To Do:
+#- Fix function arguments
+#- Implement a way to increase the number of functions
+#- Implement a way to join functions when there is a low load requirement
+#- Implement input queue polling
+#- Implement input iterator polling
+#- Start Joining Threads
+
+
+#- Joining backgrounders should be at object and not queue level
+#- Remap worker processes and COMPLETION to make sure it's sycned
+
