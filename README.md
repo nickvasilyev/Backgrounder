@@ -1,6 +1,6 @@
 #Backgrounder README
 
-[![Build Status](https://travis-ci.org/nickvasilyev/Backgrounder.svg?branch=master)](https://travis-ci.org/nickvasilyev/Backgrounder)
+[![Build Status](https://travis-ci.org/nickvasilyev/Backgrounder.svg?branch=develop)](https://travis-ci.org/nickvasilyev/Backgrounder)
 
 Lets say you have something like this: 
 
