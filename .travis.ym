@@ -1,6 +1,7 @@
+#http://github.com/nickvasilyev/Backgrounder
 language: python
 python:
-    - "3.4"
+  - "3.4"
 script:
-  cd tests
-  python Backgrounder_unittests.py
+-  cd tests
+-  python Backgrounder_unittests.py
