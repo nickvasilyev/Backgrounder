@@ -3,7 +3,9 @@ language: python
 python:
   - "3.4"
 before_script:
--  PYTHONPATH=$PYTHONPATH:$(pwd)/Backgrounder
+-  env
+-  export PYTHONPATH=$PYTHONPATH:$(pwd)/Backgrounder
+-  echo $PYTHONPATH 
 script:
 -  cd tests
 -  python Backgrounder_unittests.py
