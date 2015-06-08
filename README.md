@@ -1,5 +1,7 @@
 #Backgrounder README
 
+[![Build Status](https://travis-ci.org/nickvasilyev/Backgrounder.svg?branch=master)](https://travis-ci.org/nickvasilyev/Backgrounder)
+
 Lets say you have something like this: 
 
     x = self.slow_data_getting_function(1,test1) #Lets say this takes a second
