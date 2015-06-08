@@ -2,7 +2,8 @@ import logging
 import sys
 import code
 import unittest
-import backgrounder
+from Backgrounder import Backgrounder
+import Backgrounder as backgrounder
 logging.basicConfig(level=logging.DEBUG,format='%(asctime)s [%(levelname)s] (%(process)d) (%(threadName)-10s) %(message)s')
 from time import time,sleep
 
@@ -122,7 +123,7 @@ class BackgrounderTests(unittest.TestCase):
         logging.info("test_regular_fast_function Backgrounder Completed in {} seconds".format(str(time() - a)))
         logging.info(test1results)
         logging.info(test2results)
-        self.assertEqual(test1results,test2results)
+        self.assertEqual(set(test1results),set(test2results))
 
     def test_closure_function(self):
         basedata = [x for x in range(1,101)] 
