@@ -4,14 +4,14 @@
 
 Lets say you have something like this: 
 
-    x = self.slow_data_getting_function(1,test1) #Lets say this takes a second
+    x = self.slow_data_getting_function(some_args) #Lets say this takes a second
     while x:
         self.slow_processing_function(x) #Lets say this takes a second too
-        x = self.slow_data_getting_function(1,test1)
+        x = self.slow_data_getting_function(some_args)
 
 You can run it like this with backgroudner and cut the time almost in half:
 
-    bg=Backgrounder(self.slow_data_getting_function,fn_args=[1,test2]) #Starts backgrounder
+    bg=Backgrounder(self.slow_data_getting_function,fn_args=[some_args]) #Starts backgrounder
     while bg.status(): 
         x = bg.get_one() #While it is running pull out some items
         if x:
