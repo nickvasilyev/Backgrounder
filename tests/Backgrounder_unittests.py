@@ -2,7 +2,8 @@ import logging
 import sys
 import code
 import unittest
-import backgrounder
+from Backgrounder import Backgrounder
+import Backgrounder as backgrounder
 logging.basicConfig(level=logging.DEBUG,format='%(asctime)s [%(levelname)s] (%(process)d) (%(threadName)-10s) %(message)s')
 from time import time,sleep
 
